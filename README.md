@@ -1,2 +1,4 @@
 # merger_precursor
-Light curve model of precursors preceding mergers of SN progenitor star with compact object companion
+This repository shows a light curve model of precursors preceding mergers of SN progenitor star with compact object companion.
+
+The prec_merger.py script is the execution script, which computes the (i) mass-loss rate and velocity of the disk wind/(wind+CBO), and (ii) the luminosity and temperature of the precursor. These are stored in the output files "lc_diskwind_(...).txt" (for the unimpeded disk wind), and "lc_CBO_(...).txt" (for the merged wind+CBO outflow).
