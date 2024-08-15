@@ -14,7 +14,7 @@ M_CO = 1.4*con.Msun # compact object mass
 p_BB = 0.5 # power-law index of ADAF accretion disk (Blandford & Begelman 99)
 rin_d = 1.2e6 # 6.*con.G*M_CO/con.c**2  # inner radius of ADAF accretion disk
 
-f_Omega_CBO = 1.0 # covering fraction of circumbinary outflow (0 means disk wind only, 1 means isotropic CBO) 
+f_Omega_CBO = 1.0 # covering fraction of circumbinary outflow (0 means disk wind only, 1 means isotropic CBO)
 
 ##########################################################
 
@@ -77,4 +77,4 @@ for (file_id, q) in zip(file_ids, q_arr):
 		Lobs_CBO, T_col, r_col, rtrap, vout_obs = fun.T_col_with_CBO(time, f_Omega_CBO, abin, Mdot_rlof, Mdot_wind, Mdot_total, v_CBO, vwind, Lobs, intp_lgkapgrid, intp_lgkapscat)
 	
 	# save CBO parameters + observables
-	np.savetxt('lc_CBO_%s.txt' % file_id, np.c_[(time-time[-1])[i_P:]/3.156e7, Mdot_total[i_P:]*3.156e7/con.Msun, abin[i_P:], vout_obs[i_P:], Lobs_CBO[i_P:], T_col[i_P:], rtrap[i_P:], r_col[i_P:]], header='time [yr], MdotCBO [Msun/yr], abin [cm], v_CBO [cm/s], lum [erg/s], T_col_CBO [K], r_tr [cm], r_col [cm]', fmt='%.6g')
+	np.savetxt('lc_CBO_%s_fOmega%g.txt' % (file_id, f_Omega_CBO), np.c_[(time-time[-1])[i_P:]/3.156e7, Mdot_total[i_P:]*3.156e7/con.Msun, abin[i_P:], vout_obs[i_P:], Lobs_CBO[i_P:], T_col[i_P:], rtrap[i_P:], r_col[i_P:]], header='time [yr], MdotCBO [Msun/yr], abin [cm], v_CBO [cm/s], lum [erg/s], T_col_CBO [K], r_tr [cm], r_col [cm]', fmt='%.6g')
