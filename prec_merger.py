@@ -1,3 +1,8 @@
+#
+# Light curve source code for the MESA models used in Tsuna+24, to reproduce the light curves in that paper.
+# For a flexible model with tunable mass transfer history and mass ratio (q>0.4), see prec_merger_flexible.py
+#
+
 import math
 import numpy as np
 import sys
@@ -5,16 +10,27 @@ import sys
 import constants as con
 import functions as fun
 
-# model parameters (solar metallicity)
-X_H = 0.0 # hydrogen mass fraction
-use_tab_opac = True # use opacity table. only supports X_H=0. if false, use Kramers for absorption opacity.
-
+# fixed model parameters (solar metallicity)
+X_H = 0.0 # hydrogen mass fraction. currently only supports X_H=0.
 CO = 'NS' # NS or BH
 M_CO = 1.4*con.Msun # compact object mass
+
+#
+# adjustable model parameters
+#
+
+# for NS accretion disk
 p_BB = 0.5 # power-law index of ADAF accretion disk (Blandford & Begelman 99)
 rin_d = 1.2e6 # 6.*con.G*M_CO/con.c**2  # inner radius of ADAF accretion disk
 
+# for CBO geometry
 f_Omega_CBO = 1.0 # covering fraction of circumbinary outflow (0 means disk wind only, 1 means isotropic CBO)
+
+#
+# MESA files for published results (file ID contains initial He star mass, initial period)
+#
+file_ids = ['M2.754_P100d', 'M2.754_P10d', 'M2.467_P100d', 'M2.467_P10d', 'M2.467_P1d', 'M2.754_P1d']
+q_arr = [0.5478, 0.7398, 0.8858, 0.9226, 0.9693, 0.8117] # M_CO/M_*
 
 ##########################################################
 
@@ -26,11 +42,8 @@ f_Omega_CBO = 1.0 # covering fraction of circumbinary outflow (0 means disk wind
 from load_kap_table import *
 intp_lgkapscat = fun.load_kap_scat(X_H, 'inputs/opacity_tables/kappa_sc_z0.02_x0.0.txt') 
 
-
-# load mass transfer history (Macleod & Loeb 20)
-file_ids = ['M2.754_P100d', 'M2.754_P10d', 'M2.467_P100d', 'M2.467_P10d', 'M2.467_P1d', 'M2.754_P1d']
-q_arr = [0.5478, 0.7398, 0.8858, 0.9226, 0.9693, 0.8117] # M_CO/M_*
 for (file_id, q) in zip(file_ids, q_arr):
+	# load mass transfer history (Macleod & Loeb 20)
 	print('working on %s, q=%g' % (file_id, q))
 	rlof_data = np.loadtxt('inputs/rlof_outp/RLOF_%s.txt' % file_id, skiprows=1)
 	time = rlof_data[:,0]
@@ -41,13 +54,12 @@ for (file_id, q) in zip(file_ids, q_arr):
 	rlof_dict = {'time': time, 'abin': abin, 'Mdot': Mdot_rlof}
 
 	# make the data coarser to ~200 points for speed
-	# and we skip calculation for one (initial) orbital period, as the
 	time = time[::int(len(time)/200)]
 	abin = abin[::int(len(abin)/200)]
 	Mdot_rlof = Mdot_rlof[::int(len(Mdot_rlof)/200)]
 
 	# L2 mass-loss grid (Lu+23)
-	L2file = 'inputs/disk_sltns/fL2grid_M1.4_q%.4f_case2.pkl' % q
+	L2file = 'inputs/disk_sltns/fL2grid_M%.1f_q%.4f_case2.pkl' % (M_CO/con.Msun, q)
 
 	# calculate CO wind properties
 	print('!!! Emission from disk wind !!!')
